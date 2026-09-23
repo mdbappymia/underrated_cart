@@ -1,3 +1,4 @@
+import { useAuth } from "@/context/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
@@ -13,6 +14,8 @@ import {
 export default function SearchResultsScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
+
+  const { addToCart, checkCartItemExists } = useAuth();
 
   const handleSearch = async (text: string) => {
     try {
@@ -101,8 +104,17 @@ export default function SearchResultsScreen() {
                 </Text>
               </View>
 
-              <Pressable className="w-7 h-7 rounded-full bg-indigo-600 justify-center items-center shadow-sm">
-                <Ionicons name="add" size={16} color="white" />
+              <Pressable
+                onPress={() => {
+                  addToCart(item);
+                }}
+                className="w-7 h-7 rounded-full bg-indigo-600 justify-center items-center shadow-sm"
+              >
+                {checkCartItemExists(item.id) ? (
+                  <Ionicons name="checkmark" size={16} color="white" />
+                ) : (
+                  <Ionicons name="add" size={16} color="white" />
+                )}
               </Pressable>
             </View>
           </View>

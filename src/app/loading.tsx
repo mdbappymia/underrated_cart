@@ -14,7 +14,7 @@ const Loading = () => {
         router.replace("/starter");
       }
     }
-  }, [loading, user]);
+  }, [loading]);
 
   return (
     <View className="flex-1 justify-center items-center bg-white">

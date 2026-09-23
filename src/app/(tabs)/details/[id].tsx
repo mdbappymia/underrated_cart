@@ -1,6 +1,7 @@
+import { useAuth } from "@/context/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
-import { ShoppingBag } from "lucide-react-native";
+import { Check } from "lucide-react-native";
 import { useCallback, useEffect, useState } from "react";
 import {
   Dimensions,
@@ -17,6 +18,7 @@ export default function ProductDetailsScreen() {
   const [selectedSize, setSelectedSize] = useState("8");
   const [isFavorite, setIsFavorite] = useState(false);
   const [product, setProduct] = useState<any>(null);
+  const { addToCart, checkCartItemExists } = useAuth();
 
   // Fetch product details based on the ID
   useEffect(() => {
@@ -191,30 +193,30 @@ export default function ProductDetailsScreen() {
               })}
             </View>
           </View>
-          <View className="mb-6 flex flex-row justify-between p-5 gap-6 items-center">
-            <Pressable className="w-64 border rounded-full flex-row justify-center items-center bg-[#A10E10]">
-              <Text className="text-base p-3 font-bold text-white">
-                Buy now
-              </Text>
-            </Pressable>
-            <ShoppingBag size={35} color={"#7d7a7a"} />
-          </View>
         </View>
       </ScrollView>
 
-      <View className="absolute bottom-0 left-0 right-0 bg-white px-6 py-4 border-t border-gray-100 flex-row items-center space-x-4">
-        {/* Cart Bag Icon Button */}
-        <Pressable className="w-14 h-14 bg-gray-100 rounded-2xl items-center justify-center">
-          <Ionicons name="bag-outline" size={22} color="#4b5563" />
-        </Pressable>
-
+      <View className=" bottom-20 left-0 right-0 bg-white px-10 py-4 border-t border-gray-100 flex-row items-center space-x-4 gap-5">
         <Pressable
           onPress={() => {
-            // Add your checkout or buy navigation logic here
+            !checkCartItemExists(product.id) && addToCart(product);
+            router.push("/cart");
           }}
-          className="flex-1 bg-red-700 h-14 rounded-2xl items-center justify-center shadow-lg shadow-red-200"
+          className="flex-1 rounded-full bg-red-700 h-14 items-center justify-center shadow-lg shadow-red-200"
         >
           <Text className="text-white font-bold text-base">Buy Now</Text>
+        </Pressable>
+        <Pressable
+          onPress={() => {
+            addToCart(product);
+          }}
+          className="w-14 h-14 rounded-2xl items-center justify-center"
+        >
+          {checkCartItemExists(product.id) ? (
+            <Check size={22} color="#4b5563" />
+          ) : (
+            <Ionicons name="bag-outline" size={22} color="#4b5563" />
+          )}
         </Pressable>
       </View>
     </View>

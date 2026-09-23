@@ -5,13 +5,6 @@ import { useEffect, useState } from "react";
 const useAuthData = () => {
   const [user, setUser] = useState<any>({});
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState({
-    gender: "All",
-    brands: ["Puma", "Nike", "Supreme"],
-    colors: ["Black", "Yellow", "Green"],
-    minPrice: 16,
-    maxPrice: 543,
-  });
 
   const handleLogin = async (email: string, password: string) => {
     if (typeof email === "string" && typeof password === "string") {
@@ -144,7 +137,7 @@ const useAuthData = () => {
     fetchUserData();
   }, []);
 
-  return { user, handleLogin, loading, handleLogout, filter, setFilter };
+  return { user, handleLogin, loading, handleLogout };
 };
 
 export default useAuthData;

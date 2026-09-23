@@ -1,3 +1,4 @@
+import CartTabIcon from "@/components/CartTabIcon";
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 
@@ -45,11 +46,7 @@ export default function RootLayout() {
         options={{
           title: "Cart",
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? "cart" : "cart-outline"}
-              size={25}
-              color={color}
-            />
+            <CartTabIcon color={color as string} focused={focused} />
           ),
         }}
       />
@@ -100,6 +97,20 @@ export default function RootLayout() {
         name="details/[id]"
         options={{
           title: "Details",
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="checkout"
+        options={{
+          title: "Checkout",
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="successfull"
+        options={{
+          title: "Successfull",
           href: null,
         }}
       />
