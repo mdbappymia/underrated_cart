@@ -2,13 +2,12 @@ import CartTabIcon from "@/components/CartTabIcon";
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 
-export default function RootLayout() {
+export default function AppLayout() {
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
-
         tabBarStyle: {
           position: "absolute",
           left: 20,

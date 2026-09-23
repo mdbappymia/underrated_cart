@@ -12,7 +12,7 @@ import {
 } from "react-native";
 
 export default function HomeScreen() {
-  const { user } = useAuth();
+  const { user, manageFavorite, checkFavorite } = useAuth();
   const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState({ name: "", image: "" });
   const [activeSlide, setActiveSlide] = useState(0);
@@ -48,8 +48,8 @@ export default function HomeScreen() {
       try {
         const response = await fetch(
           activeCategory.name === ""
-            ? "https://dummyjson.com/products?limit=5"
-            : `https://dummyjson.com/products/category/${activeCategory.name}?limit=5`,
+            ? "https://dummyjson.com/products?limit=20"
+            : `https://dummyjson.com/products/category/${activeCategory.name}?limit=20`,
         );
         const data = await response.json();
         setFeatureProducts(data.products);
@@ -60,7 +60,7 @@ export default function HomeScreen() {
     const fetchRecommendedProducts = async () => {
       try {
         const response = await fetch(
-          "https://dummyjson.com/products?limit=3&sortBy=rating&order=desc",
+          "https://dummyjson.com/products?limit=10&sortBy=rating&order=desc",
         );
         const data = await response.json();
         setRecommendedProducts(data.products);
@@ -226,8 +226,13 @@ export default function HomeScreen() {
                 source={{ uri: item.thumbnail }}
                 className="w-full h-36 rounded-xl"
               />
-              <Pressable className="absolute top-2 right-2 bg-black/20 p-1.5 rounded-full">
-                <Ionicons name="heart-outline" size={16} color="white" />
+              <Pressable
+                onPress={() => {
+                  manageFavorite(item.id);
+                }}
+                className={`absolute top-2 right-2 ${checkFavorite(item.id) ? "bg-green-300" : "bg-black/20"} p-1.5 rounded-full`}
+              >
+                <Ionicons name="heart-outline" size={16} color={"white"} />
               </Pressable>
             </View>
             <Text className="text-sm font-bold text-gray-900 mt-2">
@@ -267,7 +272,12 @@ export default function HomeScreen() {
                 source={{ uri: item.thumbnail }}
                 className="w-full h-36 rounded-xl"
               />
-              <Pressable className="absolute top-2 right-2 bg-black/20 p-1.5 rounded-full">
+              <Pressable
+                onPress={() => {
+                  manageFavorite(item.id);
+                }}
+                className={`absolute top-2 right-2 ${checkFavorite(item.id) ? "bg-green-300" : "bg-black/20"} p-1.5 rounded-full`}
+              >
                 <Ionicons name="heart-outline" size={16} color="white" />
               </Pressable>
             </View>

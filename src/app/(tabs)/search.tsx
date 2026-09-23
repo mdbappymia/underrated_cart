@@ -3,6 +3,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
   Image,
   Pressable,
@@ -14,8 +15,15 @@ import {
 export default function SearchResultsScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const { addToCart, checkCartItemExists } = useAuth();
+  const {
+    addToCart,
+    checkCartItemExists,
+    manageFavorite,
+    checkFavorite,
+    user,
+  } = useAuth();
 
   const handleSearch = async (text: string) => {
     try {
@@ -26,6 +34,8 @@ export default function SearchResultsScreen() {
       setSearchResults(data.products);
     } catch (error) {
       console.error("Error fetching search results:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -71,55 +81,71 @@ export default function SearchResultsScreen() {
         </Text>
       </View>
 
-      <FlatList
-        className="mb-20"
-        data={searchResults}
-        keyExtractor={(item) => item.id}
-        numColumns={2}
-        showsVerticalScrollIndicator={false}
-        columnWrapperStyle={{ justifyContent: "space-between" }}
-        contentContainerStyle={{ paddingBottom: 30 }}
-        renderItem={({ item }) => (
-          <View className="w-[48%] bg-gray-50 rounded-2xl p-2.5 border border-gray-100 mb-4">
-            <View className="relative">
-              <Image
-                source={{ uri: item.thumbnail }}
-                className="w-full h-36 rounded-xl"
-              />
-              <Pressable className="absolute top-2 right-2 bg-black/20 p-1.5 rounded-full">
-                <Ionicons name="heart-outline" size={16} color="white" />
-              </Pressable>
-            </View>
-
-            <View className="mt-2.5 flex-row justify-between items-end">
-              <View className="flex-1 mr-1">
-                <Text
-                  className="text-sm font-bold text-gray-900"
-                  numberOfLines={1}
-                >
-                  {item.title}
-                </Text>
-                <Text className="text-xs font-bold text-blue-600 mt-0.5">
-                  ${item.price.toFixed(2)}
-                </Text>
-              </View>
-
+      <>
+        {!loading ? (
+          <FlatList
+            className="mb-20"
+            data={searchResults}
+            keyExtractor={(item) => item.id}
+            numColumns={2}
+            showsVerticalScrollIndicator={false}
+            columnWrapperStyle={{ justifyContent: "space-between" }}
+            contentContainerStyle={{ paddingBottom: 30 }}
+            renderItem={({ item }) => (
               <Pressable
-                onPress={() => {
-                  addToCart(item);
-                }}
-                className="w-7 h-7 rounded-full bg-indigo-600 justify-center items-center shadow-sm"
+                onPress={() => router.push(`/details/${item.id}`)}
+                className="w-[48%] bg-gray-50 rounded-2xl p-2.5 border border-gray-100 mb-4"
               >
-                {checkCartItemExists(item.id) ? (
-                  <Ionicons name="checkmark" size={16} color="white" />
-                ) : (
-                  <Ionicons name="add" size={16} color="white" />
-                )}
+                <View className="relative">
+                  <Image
+                    source={{ uri: item.thumbnail }}
+                    className="w-full h-36 rounded-xl"
+                  />
+                  <Pressable
+                    onPress={() => {
+                      manageFavorite(item.id);
+                    }}
+                    className={`absolute top-2 right-2 ${checkFavorite(item.id) ? "bg-green-300" : "bg-black/20"} p-1.5 rounded-full`}
+                  >
+                    <Ionicons name="heart-outline" size={16} color="white" />
+                  </Pressable>
+                </View>
+
+                <View className="mt-2.5 flex-row justify-between items-end">
+                  <View className="flex-1 mr-1">
+                    <Text
+                      className="text-sm font-bold text-gray-900"
+                      numberOfLines={1}
+                    >
+                      {item.title}
+                    </Text>
+                    <Text className="text-xs font-bold text-blue-600 mt-0.5">
+                      ${item.price.toFixed(2)}
+                    </Text>
+                  </View>
+
+                  <Pressable
+                    onPress={() => {
+                      addToCart(item, user);
+                    }}
+                    className="w-7 h-7 rounded-full bg-indigo-600 justify-center items-center shadow-sm"
+                  >
+                    {checkCartItemExists(item.id) ? (
+                      <Ionicons name="checkmark" size={16} color="white" />
+                    ) : (
+                      <Ionicons name="add" size={16} color="white" />
+                    )}
+                  </Pressable>
+                </View>
               </Pressable>
-            </View>
+            )}
+          />
+        ) : (
+          <View className="flex-1 justify-center items-center bg-white">
+            <ActivityIndicator size="large" color="#3b82f6" />
           </View>
         )}
-      />
+      </>
     </View>
   );
 }

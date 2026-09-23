@@ -1,7 +1,7 @@
 import { useAuth } from "@/context/AuthContext";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { memo, useCallback, useMemo } from "react";
+import { memo, useCallback } from "react";
 import { FlatList, Image, Pressable, Text, View } from "react-native";
 
 type CartItem = {
@@ -84,7 +84,7 @@ export default function CartScreen() {
     removeFromCart,
     increaseQuantity,
     decreaseQuantity,
-    setOrderSummary,
+    orderSummary,
   } = useAuth();
 
   const removeItem = useCallback(
@@ -99,24 +99,6 @@ export default function CartScreen() {
     (id: string) => decreaseQuantity(id),
     [decreaseQuantity],
   );
-
-  const { totalItemsCount, subtotal } = useMemo(
-    () =>
-      cartItems.reduce(
-        (
-          totals: { totalItemsCount: number; subtotal: number },
-          item: CartItem,
-        ) => ({
-          totalItemsCount: totals.totalItemsCount + item.quantity,
-          subtotal: totals.subtotal + item.price * item.quantity,
-        }),
-        { totalItemsCount: 0, subtotal: 0 },
-      ),
-    [cartItems],
-  );
-  const discount = 4;
-  const deliveryCharges = 2;
-  const finalTotal = subtotal - discount + deliveryCharges;
 
   return (
     <View className="flex-1 bg-white">
@@ -137,7 +119,7 @@ export default function CartScreen() {
             contentContainerClassName="pb-2"
             showsVerticalScrollIndicator={false}
             data={cartItems as CartItem[]}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item.id + Math.random()}
             renderItem={({ item }) => (
               <MemoizedCartItemRow
                 item={item}
@@ -171,21 +153,27 @@ export default function CartScreen() {
           <View className="flex-row justify-between">
             <Text className="text-sm text-gray-500 font-medium">Items</Text>
             <Text className="text-sm font-bold text-gray-900">
-              {totalItemsCount}
+              {orderSummary.totalQuantity}
             </Text>
           </View>
 
           <View className="flex-row justify-between">
             <Text className="text-sm text-gray-500 font-medium">Subtotal</Text>
             <Text className="text-sm font-bold text-gray-900">
-              ${subtotal > 0 && subtotal.toFixed(2)}
+              ${orderSummary.total > 0 && Number(orderSummary.total).toFixed(2)}
             </Text>
           </View>
 
           <View className="flex-row justify-between">
             <Text className="text-sm text-gray-500 font-medium">Discount</Text>
             <Text className="text-sm font-bold text-gray-900">
-              ${cartItems.length > 0 ? discount : 0}
+              $
+              {cartItems.length > 0
+                ? (
+                    Number(orderSummary.total) -
+                    Number(orderSummary.discountedTotal)
+                  ).toFixed(2)
+                : 0}
             </Text>
           </View>
 
@@ -194,7 +182,7 @@ export default function CartScreen() {
               Delivery Charges
             </Text>
             <Text className="text-sm font-bold text-gray-900">
-              ${cartItems.length > 0 ? deliveryCharges : 0}
+              ${cartItems.length > 0 ? 2 : 0}
             </Text>
           </View>
 
@@ -202,8 +190,8 @@ export default function CartScreen() {
             <Text className="text-base font-bold text-gray-900">Total</Text>
             <Text className="text-base font-bold text-gray-900">
               $
-              {cartItems.length > 0 && finalTotal > 0
-                ? finalTotal.toFixed(2)
+              {cartItems.length > 0 && orderSummary.discountedTotal > 0
+                ? Number(orderSummary.discountedTotal) + 2
                 : 0}
             </Text>
           </View>
@@ -213,13 +201,6 @@ export default function CartScreen() {
       <View className="absolute bottom-20 left-0 right-0 bg-white px-6 py-4 border-t border-gray-100">
         <Pressable
           onPress={() => {
-            setOrderSummary({
-              totalItemsCount,
-              subtotal,
-              discount,
-              deliveryCharges,
-              finalTotal,
-            });
             router.push("/checkout");
           }}
           className="w-full bg-red-700 h-14 rounded-2xl items-center justify-center shadow-lg shadow-red-200"
