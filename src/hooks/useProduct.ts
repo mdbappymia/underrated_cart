@@ -49,6 +49,11 @@ const useProduct = () => {
             totalQuantity: data.totalQuantity,
           });
         }
+      })
+      .catch((err) => {
+        console.log(err);
+        alert("Error adding to cart");
+        return;
       });
   };
 
@@ -80,6 +85,11 @@ const useProduct = () => {
             totalQuantity: data.totalQuantity,
           });
         }
+      })
+      .catch((err) => {
+        console.log(err);
+        alert("Error increasing quantity");
+        return;
       });
   };
 
@@ -116,6 +126,11 @@ const useProduct = () => {
             totalQuantity: data.totalQuantity,
           });
         }
+      })
+      .catch((err) => {
+        console.log(err);
+        alert("Error decreasing quantity");
+        return;
       });
   };
 
@@ -135,6 +150,11 @@ const useProduct = () => {
           totalProducts: data.totalProducts,
           totalQuantity: data.totalQuantity,
         });
+      })
+      .catch((err) => {
+        console.log(err);
+        alert("Error removing from cart");
+        return;
       });
   };
 
@@ -145,6 +165,10 @@ const useProduct = () => {
       .then((res) => res.json())
       .then((data) => {
         setCartItems([]);
+      })
+      .catch((err) => {
+        console.log(err);
+        alert("Error clearing cart");
       });
   };
 
@@ -174,7 +198,6 @@ const useProduct = () => {
           .then((data) => {
             if (data.carts[0]) {
               setCartItems(data.carts[0].products);
-
               setOrderSummary({
                 id: data.carts[0].id,
                 total: data.carts[0].total,
@@ -184,6 +207,11 @@ const useProduct = () => {
                 totalQuantity: data.carts[0].totalQuantity,
               });
             }
+          })
+          .catch((err) => {
+            console.log(err);
+            // alert("Error fetching cart");
+            return;
           });
       }
     };
