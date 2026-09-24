@@ -13,7 +13,7 @@ export default function AppLayout() {
         <ActivityIndicator size="large" color="#3b82f6" />
       </View>
     );
-  if (!user) return <Redirect href="/login" />;
+  if (!user.id) return <Redirect href="/login" />;
 
   return (
     <Tabs
