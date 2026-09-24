@@ -1,8 +1,20 @@
 import CartTabIcon from "@/components/CartTabIcon";
+import { useAuth } from "@/context/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
-import { Tabs } from "expo-router";
+import { Redirect, Tabs } from "expo-router";
+import { ActivityIndicator, View } from "react-native";
 
 export default function AppLayout() {
+  const { user, loading } = useAuth();
+
+  if (loading)
+    return (
+      <View className="flex-1 justify-center items-center bg-white">
+        <ActivityIndicator size="large" color="#3b82f6" />
+      </View>
+    );
+  if (!user) return <Redirect href="/login" />;
+
   return (
     <Tabs
       screenOptions={{
