@@ -10,24 +10,25 @@ import {
   View,
 } from "react-native";
 
+function getFormattedDateTime() {
+  const now = new Date();
+  const timePart = now
+    .toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    })
+    .toLowerCase();
+  const weekday = now.toLocaleDateString("en-US", { weekday: "long" });
+  const dayNum = now.getDate();
+  return `${timePart}, ${weekday} ${dayNum}`;
+}
+
 export default function CheckoutScreen() {
   const [selectedPayment, setSelectedPayment] = useState("wallet");
   const { orderSummary, user, clearCart, setOrderSummary } = useAuth();
 
-  function getFormattedDateTime() {
-    const now = new Date();
-    const timePart = now
-      .toLocaleTimeString("en-US", {
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: true,
-      })
-      .toLowerCase();
-    const weekday = now.toLocaleDateString("en-US", { weekday: "long" });
-    const dayNum = now.getDate();
-    return `${timePart}, ${weekday} ${dayNum}`;
-  }
-  // console.log(orderSummary);
+  // console.log(user);
   return (
     <>
       {user.id && orderSummary ? (
@@ -50,15 +51,15 @@ export default function CheckoutScreen() {
               </View>
               <View className="flex-1">
                 <Text className="text-sm font-bold text-gray-900">
-                  {(user && user.address && user.address.address) || ""},{" "}
-                  {(user && user.address && user.address.city) || ""}
+                  {(user.address && user.address.address) || ""},{" "}
+                  {(user.address && user.address.city) || ""}
                 </Text>
                 <Text
                   className="text-xs text-gray-400 mt-0.5"
                   numberOfLines={1}
                 >
-                  {(user && user.address && user.address.state) || ""},{" "}
-                  {(user && user.address && user.address.country) || ""}
+                  {(user.address && user.address.state) || ""},{" "}
+                  {(user.address && user.address.country) || ""}
                 </Text>
               </View>
             </View>
@@ -85,7 +86,7 @@ export default function CheckoutScreen() {
                     Items
                   </Text>
                   <Text className="text-sm font-bold text-gray-900">
-                    {orderSummary.totalProducts}
+                    {orderSummary.totalProducts || 0}
                   </Text>
                 </View>
 
@@ -107,10 +108,13 @@ export default function CheckoutScreen() {
                   </Text>
                   <Text className="text-sm font-bold text-gray-900">
                     $
-                    {(
-                      Number(orderSummary.total) -
-                      Number(orderSummary.discountedTotal)
-                    ).toFixed(2)}
+                    {Number.isFinite(Number(orderSummary.discountedTotal)) &&
+                    Number(orderSummary.discountedTotal) > 0
+                      ? (
+                          Number(orderSummary.total) -
+                          Number(orderSummary.discountedTotal)
+                        ).toFixed(2)
+                      : 0}
                   </Text>
                 </View>
 
@@ -180,8 +184,8 @@ export default function CheckoutScreen() {
                 router.push("/successfull");
               }}
               disabled={
-                !isNaN(orderSummary.subtotal) &&
-                Number(orderSummary.subtotal) < 1
+                !Number.isFinite(Number(orderSummary.discountedTotal)) ||
+                Number(orderSummary.discountedTotal) <= 0
               }
               className="w-full bg-red-700 disabled:bg-gray-700 h-14 rounded-2xl items-center justify-center shadow-lg shadow-red-200"
             >
